@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HINOKI · Editor de carta</title>
+<meta name="theme-color" content="#d4698a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&family=Shippori+Mincho+B1:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 0; }
+:root {
+  --papel: #f9eceb; --papel-2: #f4dfe0; --rosa: #d4698a; --rosa-oscuro: #b04d6e; --rosa-claro: #f3b9c8; --rosa-palido: #fbe4ea;
+  --tinta: #44303a; --gris: #866f77; --rama: #6c4a44; --linea: #e8c9d0;
+  --titulo: 'Shippori Mincho B1', 'Hiragino Mincho ProN', Georgia, serif;
+  --letra: 'Josefin Sans', 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
+  --ui: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: #efe3e4; color: var(--tinta); font-family: var(--ui); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* ---------- Barra y editor ---------- */
+.barra { position: sticky; top: 0; z-index: 10; background: var(--tinta); color: #fff; padding: calc(10px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left)); display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.barra h1 { font: 300 17px var(--letra); letter-spacing: .25em; margin: 0; flex: 1; min-width: 170px; }
+.barra h1 small { display: block; font-size: 11px; letter-spacing: .08em; opacity: .7; font-family: var(--ui); }
+.pestanas { display: inline-flex; background: rgba(255,255,255,.12); border-radius: 99px; padding: 3px; }
+.pestanas button { border: 0; background: transparent; color: #fff; padding: 8px 14px; border-radius: 99px; font: 600 14px var(--ui); cursor: pointer; }
+.pestanas button[aria-pressed="true"] { background: #fff; color: var(--tinta); }
+.btn { border: 0; border-radius: 99px; padding: 10px 16px; font: 600 14px var(--ui); cursor: pointer; }
+.btn.rosa { background: var(--rosa); color: #fff; }
+.btn.claro { background: #fff; color: var(--tinta); border: 1px solid var(--linea); }
+.btn.texto { background: transparent; color: var(--rosa-oscuro); padding: 8px 10px; }
+.btn:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--rosa); outline-offset: 2px; }
+.estado { font-size: 12px; opacity: .8; min-width: 80px; text-align: right; }
+
+#editor { max-width: 860px; margin: 0 auto; padding: 16px max(16px, env(safe-area-inset-right)) 120px max(16px, env(safe-area-inset-left)); display: grid; gap: 14px; }
+.tarjeta { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(68,48,58,.06); }
+.tarjeta h2 { font: 700 16px var(--ui); margin: 0 0 10px; }
+.ayuda { font-size: 13px; color: var(--gris); margin: 0 0 12px; line-height: 1.45; }
+.campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+label.campo { display: grid; gap: 4px; font-size: 12px; font-weight: 600; color: var(--gris); }
+input, textarea, select { font: 15px var(--ui); color: var(--tinta); border: 1px solid var(--linea); border-radius: 10px; padding: 9px 10px; background: #fff; width: 100%; min-width: 0; }
+textarea { resize: vertical; min-height: 58px; line-height: 1.4; }
+details.pagina-ed { background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(68,48,58,.06); }
+details.pagina-ed > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+details.pagina-ed > summary::-webkit-details-marker { display: none; }
+details.pagina-ed > summary .jp { color: var(--rosa); font-family: var(--titulo); font-weight: 500; }
+details.pagina-ed > summary .cuenta { margin-left: auto; font-size: 12px; font-weight: 500; color: var(--gris); }
+details.pagina-ed > summary::before { content: '▸'; color: var(--rosa); transition: transform .15s; }
+details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
+.cuerpo-ed { padding: 0 16px 16px; display: grid; gap: 12px; }
+.seccion-ed { border: 1px solid var(--linea); border-radius: 14px; padding: 12px; display: grid; gap: 10px; background: #fffafb; }
+.cabeza-ed { display: flex; gap: 8px; align-items: end; }
+.cabeza-ed label { flex: 1; }
+.plato-ed { border-top: 1px dashed var(--linea); padding-top: 10px; display: grid; gap: 8px; }
+.plato-ed .fila { display: grid; grid-template-columns: 1fr 140px; gap: 8px; }
+@media (max-width: 520px) { .plato-ed .fila { grid-template-columns: 1fr; } }
+.mover { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.mover button { border: 1px solid var(--linea); background: #fff; color: var(--tinta); border-radius: 8px; min-width: 36px; height: 34px; font-size: 15px; cursor: pointer; }
+.mover button.borrar { color: #b3261e; }
+.mover label.sig-ed { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--rosa-oscuro); margin-right: auto; }
+.mover label.sig-ed input { width: 18px; height: 18px; }
+.anadir { display: flex; gap: 8px; flex-wrap: wrap; }
+.aviso-desborde { background: #fff3cd; color: #6b4b00; border-radius: 12px; padding: 10px 12px; font-size: 13px; }
+
+/* ---------- Vista previa ---------- */
+#vista { padding: 16px 0 60px; }
+#vista .hojas { width: 210mm; margin: 0 auto; }
+.pagina { width: 210mm; height: 297mm; position: relative; overflow: hidden; margin: 0 auto 10mm; background: radial-gradient(120% 80% at 50% 0%, #fdf4f3 0%, var(--papel) 55%, var(--papel-2) 100%); font-family: var(--titulo); color: var(--tinta); box-shadow: 0 6px 24px rgba(68,48,58,.15); }
+.deco { position: absolute; inset: 0; width: 210mm; height: 297mm; pointer-events: none; }
+.petalos path { fill: url(#gPetalo); stroke: #e7a2b5; stroke-width: .6; }
+.centro { fill: #c75479; } .estambre { stroke: #b84a6c; stroke-width: 1; } .antera { fill: #f4cf6a; }
+.boton { fill: #e690ab; } .caliz { fill: none; stroke: #7a5148; stroke-width: 1.2; }
+.rama { fill: none; stroke: var(--rama); stroke-width: 2.2; stroke-linecap: round; } .rama.fina { stroke-width: 1.3; }
+.portada .sello { position: absolute; left: 50%; top: 47%; transform: translate(-50%, -50%); width: 118mm; height: 118mm; display: grid; place-items: center; align-content: center; text-align: center; }
+.portada .aro { position: absolute; inset: 0; border: 1.4pt solid var(--rosa); border-radius: 50%; }
+.portada .aro::after { content: ''; position: absolute; inset: 3.2mm; border: .5pt solid var(--rosa-claro); border-radius: 50%; }
+.kanji-grande { font-family: var(--titulo); font-size: 40pt; color: var(--rosa); line-height: 1; margin-bottom: 4mm; }
+.nombre-grande { font-family: var(--letra); font-weight: 300; font-size: 44pt; letter-spacing: .32em; padding-left: .32em; color: var(--rosa); line-height: 1; }
+.lema { font-family: var(--letra); font-weight: 400; font-size: 9pt; letter-spacing: .28em; text-transform: uppercase; color: var(--rosa-oscuro); margin-top: 5mm; }
+.pie-portada { position: absolute; left: 0; right: 0; bottom: 30mm; display: flex; justify-content: center; gap: 4mm; font-family: var(--letra); font-size: 10pt; letter-spacing: .4em; text-transform: uppercase; color: var(--rosa-oscuro); }
+.pie-portada .punto { color: var(--rosa); }
+.contenido { padding: 16mm 20mm 14mm; display: flex; flex-direction: column; }
+.contenido header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: .6pt solid var(--linea); padding-bottom: 3mm; position: relative; }
+.marca { display: flex; align-items: baseline; gap: 2.5mm; font-family: var(--letra); font-weight: 300; font-size: 15pt; letter-spacing: .3em; color: var(--rosa); }
+.marca .kanji { font-family: var(--titulo); font-size: 14pt; letter-spacing: 0; }
+.lugar { font-family: var(--letra); font-size: 7pt; letter-spacing: .22em; text-transform: uppercase; color: var(--gris); margin-right: 26mm; }
+.cabeza { margin: 9mm 0 6mm; position: relative; }
+.cabeza .jp { display: block; font-family: var(--titulo); font-size: 11pt; letter-spacing: .3em; color: var(--rosa); margin-bottom: 1.5mm; min-height: 1em; }
+.cabeza h2 { font-family: var(--titulo); font-weight: 500; font-size: 27pt; margin: 0; color: var(--tinta); letter-spacing: .01em; }
+.cabeza .sub { margin: 2mm 0 0; font-family: var(--letra); font-size: 8.5pt; letter-spacing: .04em; color: var(--gris); }
+.cuerpo { flex: 1; position: relative; min-height: 0; overflow: hidden; }
+.cuerpo.cols2 { column-count: 2; column-gap: 9mm; column-rule: .5pt solid var(--linea); }
+.cuerpo section { break-inside: avoid-column; margin-bottom: 5mm; }
+.cuerpo section h3 { font-family: var(--letra); font-weight: 600; font-size: 8pt; letter-spacing: .26em; text-transform: uppercase; color: var(--rosa-oscuro); margin: 0 0 3mm; display: flex; align-items: center; gap: 3mm; }
+.cuerpo section h3::after { content: ''; flex: 1; height: .5pt; background: var(--linea); }
+.plato { margin-bottom: 3.6mm; break-inside: avoid; }
+.cols2 .plato { margin-bottom: 3mm; }
+.nombre { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1.6mm 2.2mm; }
+.nombre b { font-family: var(--titulo); font-weight: 700; font-size: 11.5pt; color: var(--tinta); }
+.cols2 .nombre b { font-size: 10.5pt; }
+.det { font-family: var(--letra); font-size: 7.5pt; letter-spacing: .06em; color: var(--gris); }
+.sig { display: inline-flex; align-items: center; gap: 1mm; font-family: var(--letra); font-size: 6.5pt; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--rosa); background: var(--rosa-palido); border: .5pt solid var(--rosa-claro); border-radius: 10pt; padding: .4mm 2mm .3mm 1.2mm; }
+.sig svg { width: 3.4mm; height: 3.4mm; overflow: visible; }
+.plato p { margin: .8mm 0 0; font-family: var(--titulo); font-size: 9pt; line-height: 1.38; color: #5d4850; }
+.cols2 .plato p { font-size: 8.4pt; }
+.nota { font-family: var(--letra); font-size: 7.5pt; letter-spacing: .04em; color: var(--gris); font-style: italic; margin: 1mm 0 4mm; }
+.contenido footer { display: flex; justify-content: space-between; border-top: .6pt solid var(--linea); padding-top: 2.5mm; font-family: var(--letra); font-size: 7pt; letter-spacing: .24em; text-transform: uppercase; color: var(--gris); }
+
+[hidden] { display: none !important; }
+@media print {
+  body { background: none; }
+  .barra, #editor { display: none !important; }
+  #vista { display: block !important; padding: 0; }
+  #vista .hojas { zoom: 1 !important; }
+  .pagina { margin: 0; box-shadow: none; break-after: page; page-break-after: always; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<radialGradient id="gPetalo" cx="0" cy="0" r="34" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e98aa6"/><stop offset=".45" stop-color="#f6c3d1"/><stop offset="1" stop-color="#fdeef2"/></radialGradient>
+<symbol id="flor" viewBox="-40 -40 80 80"><g class="petalos">
+<path transform="rotate(0)" d="M0 -3 C -13 -9 -17 -25 -8 -33 C -5 -35 -2 -33 0 -29 C 2 -33 5 -35 8 -33 C 17 -25 13 -9 0 -3Z"/>
+<path transform="rotate(72)" d="M0 -3 C -13 -9 -17 -25 -8 -33 C -5 -35 -2 -33 0 -29 C 2 -33 5 -35 8 -33 C 17 -25 13 -9 0 -3Z"/>
+<path transform="rotate(144)" d="M0 -3 C -13 -9 -17 -25 -8 -33 C -5 -35 -2 -33 0 -29 C 2 -33 5 -35 8 -33 C 17 -25 13 -9 0 -3Z"/>
+<path transform="rotate(216)" d="M0 -3 C -13 -9 -17 -25 -8 -33 C -5 -35 -2 -33 0 -29 C 2 -33 5 -35 8 -33 C 17 -25 13 -9 0 -3Z"/>
+<path transform="rotate(288)" d="M0 -3 C -13 -9 -17 -25 -8 -33 C -5 -35 -2 -33 0 -29 C 2 -33 5 -35 8 -33 C 17 -25 13 -9 0 -3Z"/>
+</g><circle r="6" class="centro"/><g id="estambres"></g></symbol>
+<symbol id="boton" viewBox="-12 -20 24 32"><path d="M0 10 C -9 2 -8 -12 0 -18 C 8 -12 9 2 0 10Z" class="boton"/><path d="M0 10 C -4 6 -5 2 -3 -2 M0 10 C 4 6 5 2 3 -2" class="caliz"/></symbol>
+</defs></svg>
+
+<div class="barra">
+  <h1>HINOKI<small>Editor de la carta</small></h1>
+  <div class="pestanas" role="group" aria-label="Modo">
+    <button type="button" id="verEditar" aria-pressed="true">Editar</button>
+    <button type="button" id="verVista" aria-pressed="false">Ver carta</button>
+  </div>
+  <button type="button" class="btn rosa" id="pdf">Guardar PDF</button>
+  <span class="estado" id="estado" aria-live="polite"></span>
+</div>
+
+<main id="editor"></main>
+<div id="vista" hidden><div class="hojas" id="hojas"></div></div>
+
+<script>
+(function () {
+  'use strict';
+  const CLAVE = 'hinoki-carta-v1';
+  const ORIGINAL = {"restaurante": {"nombre": "HINOKI", "kanji": "檜", "lema": "Japanese Kitchen & Cuisine", "ciudad": "Málaga"}, "paginas": [{"jp": "前菜", "titulo": "Para empezar", "sub": "Pequeños platos para abrir el apetito y compartir.", "cols": 1, "nota": "", "secciones": [{"titulo": "Frescos y pequeños bocados", "platos": [{"nombre": "Edamame", "detalle": "", "signature": false, "descripcion": "Vainas de soja cocidas al vapor, servidas al natural o con un toque picante."}, {"nombre": "Sopa miso", "detalle": "", "signature": false, "descripcion": "Caldo de miso con tofu, alga wakame y cebollino fresco."}, {"nombre": "Nasu no Miso Su", "detalle": "", "signature": true, "descripcion": "Berenjena servida fría con vinagreta de miso, cebollino, cacahuete crujiente y brotes tiernos."}, {"nombre": "Sunomono", "detalle": "", "signature": false, "descripcion": "Ensalada de wakame, pepino y cebolla encurtidos, con el delicado toque del vinagre de arroz."}, {"nombre": "Escabeche japonés de boquerones", "detalle": "", "signature": false, "descripcion": "Boquerones en escabeche de inspiración japonesa, acompañados de verduras confitadas."}, {"nombre": "Tres bocados HINOKI", "detalle": "3 bocados", "signature": true, "descripcion": "Tres bocados de brioche tostado: hamachi con emulsión de yuzu kosho y tobiko naranja; salmón con emulsión de miso blanco e ikura; atún con emulsión de wasabi y tobiko negro."}]}, {"titulo": "Bocados calientes", "platos": [{"nombre": "Gyozas de pato", "detalle": "4 unidades", "signature": false, "descripcion": "Empanadillas japonesas rellenas de pato, acompañadas de salsa hoisin."}, {"nombre": "Pollo karaage", "detalle": "", "signature": false, "descripcion": "Bocados de pollo crujiente al estilo japonés, acompañados de una salsa cremosa de chili dulce."}, {"nombre": "Yakitori de pollo", "detalle": "2 brochetas", "signature": false, "descripcion": "Brochetas de contramuslo de pollo, glaseadas con salsa teriyaki y terminadas con negi fresco."}, {"nombre": "Ebi Kushiyaki", "detalle": "2 brochetas", "signature": false, "descripcion": "Brochetas de langostino, terminadas con una suave emulsión de miso picante."}]}]}, {"jp": "刺身", "titulo": "Tartares, cortes y sashimi", "sub": "El pescado como protagonista: aliños, texturas y cortes.", "cols": 1, "nota": "Los sashimis se acompañan de wasabi y jengibre.", "secciones": [{"titulo": "Tartares y cortes", "platos": [{"nombre": "Tartar de salmón", "detalle": "", "signature": false, "descripcion": "Salmón cortado a cuchillo y aliñado con soja y sésamo, coronado con ikura y acompañado de crujiente de tapioca."}, {"nombre": "Tartar de atún", "detalle": "", "signature": false, "descripcion": "Atún cortado a cuchillo con aliño de dashi shoyu, yema, aceite de sésamo y un toque de kimchi; coronado con caviar Osetra y acompañado de crujiente de arroz."}, {"nombre": "Usuzukuri de hamachi", "detalle": "", "signature": false, "descripcion": "Finas láminas de hamachi con cremoso de aguacate, aliño de lima, soja y aceite de oliva suave, polvo de aceituna negra y brotes tiernos."}, {"nombre": "Tataki de bonito", "detalle": "9 piezas", "signature": true, "descripcion": "Bonito ligeramente marcado, acompañado de ponzu de maracuyá, berenjena a la parrilla, anacardo tostado y polvo de miso."}]}, {"titulo": "Sashimi", "platos": [{"nombre": "Sashimi moriawase", "detalle": "12 piezas", "signature": false, "descripcion": "Atún, salmón, hamachi y lubina: tres cortes de cada pescado."}, {"nombre": "Degustación de atún", "detalle": "9 piezas", "signature": true, "descripcion": "Nueve cortes para recorrer las texturas del atún: tres de akami, tres de chutoro y tres de otoro."}, {"nombre": "Sashimi de salmón", "detalle": "4 piezas", "signature": false, "descripcion": "Cuatro cortes de salmón, presentados con sencillez para destacar el producto."}, {"nombre": "Sashimi de hamachi", "detalle": "4 piezas", "signature": false, "descripcion": "Cuatro cortes de hamachi, de textura delicada."}, {"nombre": "Sashimi de lubina", "detalle": "4 piezas", "signature": false, "descripcion": "Cuatro cortes de lubina, de sabor suave y limpio."}]}]}, {"jp": "握り", "titulo": "Nigiri", "sub": "El equilibrio entre el producto y el arroz, en un solo bocado.", "cols": 1, "nota": "Nigiris servidos por pieza.", "secciones": [{"titulo": "Selección de nigiri · por pieza", "platos": [{"nombre": "Saba | Caballa", "detalle": "", "signature": false, "descripcion": "Caballa sobre arroz de sushi, terminada con un toque de kizami wasabi."}, {"nombre": "Maguro | Atún", "detalle": "", "signature": false, "descripcion": "Atún sobre arroz de sushi, acompañado de un toque de kimchi."}, {"nombre": "Sake Koji | Salmón", "detalle": "", "signature": false, "descripcion": "Salmón sobre arroz de sushi, terminado con koji."}, {"nombre": "Hamachi Yuzu", "detalle": "", "signature": false, "descripcion": "Hamachi sobre arroz de sushi, realzado con un toque de yuzu kosho."}, {"nombre": "Sake Aburi | Salmón", "detalle": "", "signature": false, "descripcion": "Salmón ligeramente flambeado sobre arroz de sushi, con un toque de queso y salsa teriyaki."}, {"nombre": "Lubina | Jalapeño", "detalle": "", "signature": false, "descripcion": "Lubina sobre arroz de sushi, terminada con un toque de jalapeño."}]}, {"titulo": "Signature HINOKI", "platos": [{"nombre": "Wagyu | Codorniz y trufa", "detalle": "", "signature": true, "descripcion": "Wagyu sobre arroz de sushi, acompañado de huevo de codorniz y crema de trufa."}]}]}, {"jp": "巻き寿司", "titulo": "Rolls, makis y temakis", "sub": "Rolls clásicos y signature, pequeños makis y conos de nori.", "cols": 2, "nota": "", "secciones": [{"titulo": "Rolls clásicos · uramaki", "platos": [{"nombre": "California Kani", "detalle": "8 piezas", "signature": false, "descripcion": "Cangrejo, pepino y aguacate con emulsión suave, terminado con huevas de capelán."}, {"nombre": "Sake Hana", "detalle": "8 piezas", "signature": false, "descripcion": "Salmón y aguacate envueltos en arroz de sushi, con sésamo en el exterior."}, {"nombre": "Akami Spicy", "detalle": "8 piezas", "signature": false, "descripcion": "Atún aliñado con sriracha y pepino, acompañado de tobiko y cebollino."}, {"nombre": "Ebi Tempura Aburi", "detalle": "8 piezas", "signature": false, "descripcion": "Langostino crujiente, queso y aguacate, coronados con salmón flambeado, salsa teriyaki y tobiko."}, {"nombre": "Pink Veggie", "detalle": "8 piezas", "signature": false, "descripcion": "Zanahoria, aguacate, pepino y pimiento rojo con aliño de mostaza y miel; cubierto de remolacha y terminado con cebolla frita."}]}, {"titulo": "Rolls signature HINOKI", "platos": [{"nombre": "Niji", "detalle": "8 piezas", "signature": true, "descripcion": "Cangrejo, aguacate y pepino, cubiertos con láminas de atún, salmón y hamachi; emulsión de yuzu y tobiko rojo y amarillo."}, {"nombre": "Kaisen Lobster", "detalle": "8 piezas", "signature": true, "descripcion": "Aguacate y pepino, coronados con bogavante en tempura, emulsión de yuzu y crujiente de miso; tobiko negro y rojo intercalados entre las piezas."}, {"nombre": "Ebi Maguro", "detalle": "8 piezas", "signature": true, "descripcion": "Langostino en tempura y aguacate, coronados con tartar de atún picante, emulsiones de ponzu y picante, cebollino y crujiente de arroz."}]}, {"titulo": "Futomaki", "platos": [{"nombre": "Negitoro | Futomaki", "detalle": "6 piezas", "signature": false, "descripcion": "Ventresca de atún, pepino, tobiko y negi, envueltos en alga nori."}]}, {"titulo": "Hosomaki", "platos": [{"nombre": "Hosomaki de salmón", "detalle": "6 piezas", "signature": false, "descripcion": "Alga nori, arroz de sushi y salmón."}, {"nombre": "Hosomaki de atún", "detalle": "6 piezas", "signature": false, "descripcion": "Alga nori, arroz de sushi y atún."}, {"nombre": "Hosomaki de aguacate", "detalle": "6 piezas", "signature": false, "descripcion": "Alga nori, arroz de sushi y aguacate."}, {"nombre": "Hosomaki de queso y cebollino", "detalle": "6 piezas", "signature": false, "descripcion": "Alga nori, arroz de sushi y queso y cebollino."}]}, {"titulo": "Temaki", "platos": [{"nombre": "Spicy Tuna Temaki", "detalle": "", "signature": false, "descripcion": "Cono de alga nori con arroz de sushi y atún picante."}, {"nombre": "Hamachi Yuzu Temaki", "detalle": "", "signature": false, "descripcion": "Cono de alga nori con arroz de sushi, hamachi y yuzu kosho."}, {"nombre": "Unagi Sansho Temaki", "detalle": "", "signature": false, "descripcion": "Cono de alga nori con arroz de sushi, anguila, salsa unagi y sansho."}]}]}, {"jp": "盛り合わせ", "titulo": "Sushi para compartir", "sub": "Selecciones de rolls y nigiris, seguidas de nuestros chirashis.", "cols": 1, "nota": "Chirashi: pescado sobre arroz de sushi, con wasabi y jengibre encurtido al lado; soja aparte.", "secciones": [{"titulo": "Selecciones HINOKI", "platos": [{"nombre": "HINOKI 12", "detalle": "12 piezas", "signature": false, "descripcion": "4 California Kani, 4 Sake Hana y 4 nigiris: atún, salmón, hamachi y lubina."}, {"nombre": "HINOKI 18", "detalle": "18 piezas", "signature": false, "descripcion": "4 California Kani, 4 Sake Hana, 6 hosomaki de atún y 4 nigiris: atún, salmón, hamachi y lubina."}, {"nombre": "HINOKI 22", "detalle": "22 piezas", "signature": false, "descripcion": "8 California Kani, 4 Sake Hana, 6 hosomaki de atún y 4 nigiris: atún, salmón, hamachi y lubina."}, {"nombre": "HINOKI Table Feast", "detalle": "50 piezas", "signature": false, "descripcion": "8 California Kani, 8 Sake Hana, 8 Niji, 6 Negitoro, 6 hosomaki de atún, 6 hosomaki de aguacate y 8 nigiris: dos de atún, salmón, hamachi y lubina."}]}, {"titulo": "Chirashi", "platos": [{"nombre": "Chirashi de salmón", "detalle": "", "signature": false, "descripcion": "Láminas de salmón sobre arroz de sushi y terminadas con negi fresco."}, {"nombre": "Chirashi de atún", "detalle": "", "signature": false, "descripcion": "Láminas de atún sobre arroz de sushi y terminadas con negi fresco."}, {"nombre": "Chirashi mixto", "detalle": "", "signature": false, "descripcion": "Selección de salmón, atún y hamachi sobre arroz de sushi, terminada con negi fresco."}]}]}, {"jp": "ご飯・麺・甘味", "titulo": "Arroces, noodles y postres", "sub": "Principales de cocina japonesa. Para terminar, nuestra selección dulce.", "cols": 1, "nota": "Consulte con nuestro equipo la información sobre alérgenos.", "secciones": [{"titulo": "Arroces y noodles", "platos": [{"nombre": "Yakisoba de pollo y shiitake", "detalle": "", "signature": false, "descripcion": "Fideos japoneses salteados con pollo, shiitake y verduras, ligados con salsa yakisoba."}, {"nombre": "Udon de langostino", "detalle": "", "signature": false, "descripcion": "Fideos udon salteados con langostinos y verduras, terminados con salsa de soja y sésamo."}, {"nombre": "Wok de verduras", "detalle": "", "signature": false, "descripcion": "Shiitake, zanahoria, calabacín, brotes de soja y cebolla salteados al wok con salsa teriyaki."}, {"nombre": "Yakimeshi de pluma ibérica", "detalle": "", "signature": false, "descripcion": "Arroz japonés salteado con dados de pluma ibérica, huevo, zanahoria y shiitake; soja, un toque de aceite de sésamo y negi fresco."}, {"nombre": "Donburi de pollo teriyaki", "detalle": "", "signature": false, "descripcion": "Bocados de contramuslo de pollo glaseados con teriyaki, sobre arroz japonés y terminados con negi fresco."}, {"nombre": "HINOKI Wagyu Yakiniku Don", "detalle": "", "signature": true, "descripcion": "Finas láminas de wagyu japonés A4, marcadas y glaseadas con tare de la casa sobre arroz japonés; negi fresco y pepino encurtido."}]}, {"titulo": "Para terminar", "platos": [{"nombre": "Cajita dulce HINOKI", "detalle": "8 bocados", "signature": false, "descripcion": "Una selección para compartir: dos mochis, dos trufas de sake y té verde, dos bocaditos de bizcocho de té con nata y azuki y dos mini dorayakis."}, {"nombre": "Helado de té verde matcha", "detalle": "", "signature": false, "descripcion": "Helado cremoso de té verde japonés."}, {"nombre": "Suflé de chocolate", "detalle": "", "signature": false, "descripcion": "Bizcocho caliente de chocolate con corazón fundente."}, {"nombre": "Cheesecake", "detalle": "", "signature": false, "descripcion": "Tarta de queso."}]}]}]};
+  const copiar = (x) => JSON.parse(JSON.stringify(x));
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const $ = (id) => document.getElementById(id);
+
+  // Estambres de la flor (se generan una vez).
+  $('estambres').innerHTML = Array.from({ length: 10 }, (_, i) => '<g transform="rotate(' + i * 36 + ')"><line x1="0" y1="-4" x2="0" y2="-13" class="estambre"/><circle cy="-14" r="1.6" class="antera"/></g>').join('');
+
+  let carta;
+  try { carta = JSON.parse(localStorage.getItem(CLAVE)) || copiar(ORIGINAL); } catch (e) { carta = copiar(ORIGINAL); }
+
+  let temporizador;
+  function guardar() {
+    clearTimeout(temporizador);
+    $('estado').textContent = 'Guardando…';
+    temporizador = setTimeout(() => {
+      try { localStorage.setItem(CLAVE, JSON.stringify(carta)); $('estado').textContent = 'Guardado'; }
+      catch (e) { $('estado').textContent = 'No se pudo guardar'; }
+    }, 300);
+  }
+
+  // ---------- Dibujo de la carta ----------
+  function ramita(x, y, escala, giro, espejo) {
+    const sx = espejo ? -1 : 1;
+    return '<g transform="translate(' + x + ' ' + y + ') scale(' + sx * escala + ' ' + escala + ') rotate(' + giro + ')">' +
+      '<path d="M0 0 C 20 6 38 4 58 16 C 70 23 80 22 92 30" class="rama"/><path d="M32 6 C 36 -4 44 -9 52 -10" class="rama fina"/><path d="M62 18 C 66 28 64 36 70 44" class="rama fina"/>' +
+      '<use href="#flor" x="38" y="-6" width="22" height="22"/><use href="#flor" x="50" y="-20" width="17" height="17" transform="rotate(20 58 -12)"/>' +
+      '<use href="#flor" x="70" y="12" width="24" height="24"/><use href="#flor" x="60" y="34" width="16" height="16"/><use href="#flor" x="14" y="-4" width="14" height="14"/>' +
+      '<use href="#boton" x="86" y="22" width="8" height="11" transform="rotate(60 90 27)"/><use href="#boton" x="47" y="-15" width="6" height="8" transform="rotate(-30 50 -11)"/>' +
+      '<use href="#boton" x="68" y="42" width="7" height="9" transform="rotate(150 71 46)"/></g>';
+  }
+  function portada(r) {
+    return '<article class="pagina portada"><svg class="deco" viewBox="0 0 210 297" aria-hidden="true">' +
+      ramita(-6, 6, 1.05, 12) + ramita(216, 2, 0.95, 14, true) + ramita(-10, 290, 0.8, -30) + ramita(220, 294, 0.85, -26, true) +
+      '<use href="#flor" x="150" y="64" width="9" height="9" opacity=".6"/><use href="#flor" x="48" y="226" width="7" height="7" opacity=".55"/>' +
+      '<use href="#flor" x="166" y="210" width="6" height="6" opacity=".5"/><use href="#flor" x="34" y="96" width="6" height="6" opacity=".5"/></svg>' +
+      '<div class="sello"><div class="aro"></div><div class="kanji-grande">' + esc(r.kanji) + '</div><div class="nombre-grande">' + esc(r.nombre) + '</div><div class="lema">' + esc(r.lema) + '</div></div>' +
+      '<div class="pie-portada"><span>Carta</span>' + (r.ciudad ? '<span class="punto">·</span><span>' + esc(r.ciudad) + '</span>' : '') + '</div></article>';
+  }
+  function hoja(pg, i, total, r) {
+    const secciones = pg.secciones.map((s) => '<section><h3>' + esc(s.titulo) + '</h3>' + s.platos.map((p) =>
+      '<div class="plato"><div class="nombre"><b>' + esc(p.nombre) + '</b>' + (p.detalle ? '<span class="det">' + esc(p.detalle) + '</span>' : '') +
+      (p.signature ? '<span class="sig"><svg viewBox="-40 -40 80 80"><use href="#flor" x="-40" y="-40" width="80" height="80"/></svg>Signature</span>' : '') +
+      '</div>' + (p.descripcion ? '<p>' + esc(p.descripcion) + '</p>' : '') + '</div>').join('') + '</section>').join('');
+    return '<article class="pagina contenido"><svg class="deco" viewBox="0 0 210 297" preserveAspectRatio="none" aria-hidden="true">' + ramita(214, -6, 0.62, 18, true) + '</svg>' +
+      '<header><div class="marca"><span class="kanji">' + esc(r.kanji) + '</span><span>' + esc(r.nombre) + '</span></div><div class="lugar">' + esc(r.lema) + (r.ciudad ? ' · ' + esc(r.ciudad) : '') + '</div></header>' +
+      '<div class="cabeza"><span class="jp">' + esc(pg.jp) + '</span><h2>' + esc(pg.titulo) + '</h2>' + (pg.sub ? '<p class="sub">' + esc(pg.sub) + '</p>' : '') + '</div>' +
+      '<div class="cuerpo cols' + (pg.cols === 2 ? 2 : 1) + '">' + secciones + '</div>' +
+      (pg.nota ? '<p class="nota">' + esc(pg.nota) + '</p>' : '') +
+      '<footer><span>' + esc(r.nombre) + (r.ciudad ? ' · ' + esc(r.ciudad) : '') + '</span><span>' + (i + 1) + ' / ' + total + '</span></footer></article>';
+  }
+  function pintarCarta() {
+    $('hojas').innerHTML = portada(carta.restaurante) + carta.paginas.map((pg, i) => hoja(pg, i, carta.paginas.length, carta.restaurante)).join('');
+    ajustarZoom();
+  }
+  // En el móvil, la hoja A4 se encoge para caber en la pantalla.
+  function ajustarZoom() {
+    const ancho = 210 * 96 / 25.4;
+    $('hojas').style.zoom = Math.min(1, (window.innerWidth - 24) / ancho);
+  }
+  // Una sección que no cabe en su hoja se queda cortada: se avisa en el editor.
+  function paginasQueDesbordan() {
+    const fuera = [];
+    $('vista').hidden = false;
+    pintarCarta();
+    document.querySelectorAll('#hojas .contenido .cuerpo').forEach((c, i) => { if (c.scrollHeight > c.clientHeight + 2) fuera.push(i); });
+    return fuera;
+  }
+
+  // ---------- Editor ----------
+  const campo = (etq, ruta, valor, tipo) => tipo === 'area'
+    ? '<label class="campo">' + etq + '<textarea data-ruta="' + ruta + '">' + esc(valor) + '</textarea></label>'
+    : '<label class="campo">' + etq + '<input data-ruta="' + ruta + '" value="' + esc(valor) + '"></label>';
+  const mover = (tipo, ruta, extra) => '<div class="mover">' + (extra || '') +
+    '<button type="button" data-accion="subir" data-tipo="' + tipo + '" data-ruta="' + ruta + '" aria-label="Subir">↑</button>' +
+    '<button type="button" data-accion="bajar" data-tipo="' + tipo + '" data-ruta="' + ruta + '" aria-label="Bajar">↓</button>' +
+    '<button type="button" class="borrar" data-accion="borrar" data-tipo="' + tipo + '" data-ruta="' + ruta + '" aria-label="Borrar">✕</button></div>';
+
+  let abiertas = new Set([0]);
+  function pintarEditor() {
+    const r = carta.restaurante;
+    const fuera = paginasQueDesbordan();
+    $('vista').hidden = modo !== 'vista';
+    let h = '<div class="tarjeta"><h2>La carta</h2><p class="ayuda">Cambia lo que quieras: se guarda solo en este dispositivo. Toca «Ver carta» para verla como quedará y «Guardar PDF» para imprimirla o mandarla.</p>' +
+      '<div class="campos">' + campo('Nombre', 'restaurante.nombre', r.nombre) + campo('Kanji', 'restaurante.kanji', r.kanji) + campo('Lema', 'restaurante.lema', r.lema) + campo('Ciudad', 'restaurante.ciudad', r.ciudad) + '</div></div>';
+    if (fuera.length) h += '<div class="aviso-desborde">⚠️ ' + fuera.map((i) => '«' + esc(carta.paginas[i].titulo) + '»').join(', ') + (fuera.length === 1 ? ' no cabe' : ' no caben') + ' en su hoja. Quita algún plato, acorta textos, pásala a 2 columnas o mueve una sección a otra página.</div>';
+    carta.paginas.forEach((pg, i) => {
+      const n = pg.secciones.reduce((t, s) => t + s.platos.length, 0);
+      h += '<details class="pagina-ed" data-i="' + i + '"' + (abiertas.has(i) ? ' open' : '') + '><summary><span class="jp">' + esc(pg.jp) + '</span>' + esc(pg.titulo || 'Página sin título') + '<span class="cuenta">' + n + (n === 1 ? ' plato' : ' platos') + '</span></summary><div class="cuerpo-ed">' +
+        '<div class="campos">' + campo('Título', 'paginas.' + i + '.titulo', pg.titulo) + campo('Japonés (opcional)', 'paginas.' + i + '.jp', pg.jp) +
+        '<label class="campo">Columnas<select data-ruta="paginas.' + i + '.cols"><option value="1"' + (pg.cols !== 2 ? ' selected' : '') + '>1 columna</option><option value="2"' + (pg.cols === 2 ? ' selected' : '') + '>2 columnas</option></select></label></div>' +
+        campo('Subtítulo', 'paginas.' + i + '.sub', pg.sub) + campo('Nota al pie (opcional)', 'paginas.' + i + '.nota', pg.nota);
+      pg.secciones.forEach((s, j) => {
+        h += '<div class="seccion-ed"><div class="cabeza-ed">' + campo('Sección', 'paginas.' + i + '.secciones.' + j + '.titulo', s.titulo) + mover('seccion', i + '.' + j) + '</div>';
+        s.platos.forEach((p, k) => {
+          const base = 'paginas.' + i + '.secciones.' + j + '.platos.' + k;
+          h += '<div class="plato-ed"><div class="fila">' + campo('Plato', base + '.nombre', p.nombre) + campo('Detalle', base + '.detalle', p.detalle) + '</div>' +
+            campo('Descripción', base + '.descripcion', p.descripcion, 'area') +
+            mover('plato', i + '.' + j + '.' + k, '<label class="sig-ed"><input type="checkbox" data-ruta="' + base + '.signature"' + (p.signature ? ' checked' : '') + '> Signature</label>') + '</div>';
+        });
+        h += '<div class="anadir"><button type="button" class="btn claro" data-accion="nuevoPlato" data-ruta="' + i + '.' + j + '">+ Plato</button></div></div>';
+      });
+      h += '<div class="anadir"><button type="button" class="btn claro" data-accion="nuevaSeccion" data-ruta="' + i + '">+ Sección</button>' + mover('pagina', String(i)) + '</div></div></details>';
+    });
+    h += '<div class="anadir"><button type="button" class="btn claro" data-accion="nuevaPagina">+ Página</button></div>' +
+      '<div class="tarjeta"><h2>Copias</h2><p class="ayuda">Guarda una copia de la carta en un archivo, o recupera una. Útil para pasarla a otro dispositivo.</p>' +
+      '<div class="anadir"><button type="button" class="btn claro" data-accion="exportar">Descargar copia</button><button type="button" class="btn claro" data-accion="importar">Recuperar copia</button>' +
+      '<button type="button" class="btn texto" data-accion="original">Volver a la carta original</button></div></div>';
+    $('editor').innerHTML = h;
+  }
+
+  function poner(ruta, valor) {
+    const partes = ruta.split('.');
+    let o = carta;
+    partes.slice(0, -1).forEach((p) => { o = o[p]; });
+    o[partes[partes.length - 1]] = valor;
+  }
+  $('editor').addEventListener('input', (e) => {
+    const el = e.target;
+    if (!el.dataset.ruta) return;
+    const v = el.type === 'checkbox' ? el.checked : el.dataset.ruta.endsWith('.cols') ? Number(el.value) : el.value;
+    poner(el.dataset.ruta, v);
+    guardar();
+    if (el.tagName === 'SELECT' || el.type === 'checkbox') pintarEditor();
+  });
+  $('editor').addEventListener('toggle', (e) => {
+    const d = e.target.closest && e.target.closest('details.pagina-ed');
+    if (!d) return;
+    const i = Number(d.dataset.i);
+    if (d.open) abiertas.add(i); else abiertas.delete(i);
+  }, true);
+  // Al salir de un campo de texto se revisa si alguna página se ha quedado sin sitio.
+  $('editor').addEventListener('change', (e) => { if (e.target.dataset.ruta && e.target.tagName !== 'SELECT' && e.target.type !== 'checkbox') pintarEditor(); });
+
+  function lista(tipo, ruta) {
+    const n = ruta.split('.').map(Number);
+    if (tipo === 'pagina') return [carta.paginas, n[0]];
+    if (tipo === 'seccion') return [carta.paginas[n[0]].secciones, n[1]];
+    return [carta.paginas[n[0]].secciones[n[1]].platos, n[2]];
+  }
+  $('editor').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-accion]');
+    if (!b) return;
+    const a = b.dataset.accion, ruta = b.dataset.ruta || '';
+    if (a === 'subir' || a === 'bajar' || a === 'borrar') {
+      const [arr, k] = lista(b.dataset.tipo, ruta);
+      if (a === 'borrar') {
+        const que = b.dataset.tipo === 'plato' ? '«' + (arr[k].nombre || 'este plato') + '»' : b.dataset.tipo === 'seccion' ? 'la sección «' + arr[k].titulo + '» con sus platos' : 'la página «' + arr[k].titulo + '» con todo lo que tiene';
+        if (!confirm('¿Borrar ' + que + '?')) return;
+        arr.splice(k, 1);
+      } else {
+        const d = a === 'subir' ? -1 : 1;
+        if (k + d < 0 || k + d >= arr.length) return;
+        [arr[k], arr[k + d]] = [arr[k + d], arr[k]];
+      }
+    } else if (a === 'nuevoPlato') {
+      const [i, j] = ruta.split('.').map(Number);
+      carta.paginas[i].secciones[j].platos.push({ nombre: 'Plato nuevo', detalle: '', signature: false, descripcion: '' });
+    } else if (a === 'nuevaSeccion') {
+      carta.paginas[Number(ruta)].secciones.push({ titulo: 'Sección nueva', platos: [] });
+    } else if (a === 'nuevaPagina') {
+      carta.paginas.push({ jp: '', titulo: 'Página nueva', sub: '', cols: 1, nota: '', secciones: [{ titulo: 'Sección nueva', platos: [] }] });
+      abiertas.add(carta.paginas.length - 1);
+    } else if (a === 'exportar') {
+      const blob = new Blob([JSON.stringify(carta, null, 1)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement('a');
+      enlace.href = url; enlace.download = 'carta-' + (carta.restaurante.nombre || 'restaurante').toLowerCase() + '.json';
+      document.body.appendChild(enlace); enlace.click(); enlace.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      return;
+    } else if (a === 'importar') {
+      const entrada = document.createElement('input');
+      entrada.type = 'file'; entrada.accept = 'application/json,.json';
+      entrada.onchange = async () => {
+        try {
+          const c = JSON.parse(await entrada.files[0].text());
+          if (!c || !c.restaurante || !Array.isArray(c.paginas)) throw new Error();
+          if (!confirm('¿Cambiar la carta actual por la de la copia?')) return;
+          carta = c; guardar(); pintarEditor();
+        } catch (err) { alert('Ese archivo no es una copia de la carta.'); }
+      };
+      entrada.click();
+      return;
+    } else if (a === 'original') {
+      if (!confirm('¿Volver a la carta original? Se pierden los cambios que no estén en una copia.')) return;
+      carta = copiar(ORIGINAL);
+    }
+    guardar();
+    pintarEditor();
+  });
+
+  // ---------- Modos y PDF ----------
+  let modo = 'editar';
+  function ponerModo(m) {
+    modo = m;
+    $('verEditar').setAttribute('aria-pressed', m === 'editar');
+    $('verVista').setAttribute('aria-pressed', m === 'vista');
+    $('editor').hidden = m !== 'editar';
+    $('vista').hidden = m !== 'vista';
+    if (m === 'vista') pintarCarta();
+    window.scrollTo(0, 0);
+  }
+  $('verEditar').addEventListener('click', () => ponerModo('editar'));
+  $('verVista').addEventListener('click', () => ponerModo('vista'));
+  $('pdf').addEventListener('click', () => {
+    pintarCarta();
+    const anterior = document.title;
+    document.title = (carta.restaurante.nombre || 'Carta') + ' - Carta';
+    const volver = () => { document.title = anterior; $('vista').hidden = modo !== 'vista'; };
+    $('vista').hidden = false;
+    window.addEventListener('afterprint', volver, { once: true });
+    setTimeout(() => window.print(), 50);
+  });
+  window.addEventListener('resize', ajustarZoom);
+
+  pintarEditor();
+  ponerModo('editar');
+  if (document.fonts) document.fonts.ready.then(() => { if (!$('editor').hidden) pintarEditor(); });
+})();
+</script>
+</body>
+</html>
