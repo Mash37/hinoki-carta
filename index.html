@@ -63,7 +63,9 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
 .mover label.sig-ed { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--rosa-oscuro); margin-right: auto; }
 .mover label.sig-ed input { width: 18px; height: 18px; }
 .anadir { display: flex; gap: 8px; flex-wrap: wrap; }
-.aviso-desborde { background: #fff3cd; color: #6b4b00; border-radius: 12px; padding: 10px 12px; font-size: 13px; }
+.foto-ed { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.foto-ed img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid var(--linea); }
+.foto-ed .sin { width: 64px; height: 64px; border-radius: 10px; border: 1px dashed var(--linea); display: grid; place-items: center; color: var(--gris); font-size: 22px; }
 
 /* ---------- Vista previa ---------- */
 #vista { padding: 16px 0 60px; }
@@ -86,28 +88,32 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
 .contenido header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: .6pt solid var(--linea); padding-bottom: 3mm; position: relative; }
 .marca { display: flex; align-items: baseline; gap: 2.5mm; font-family: var(--letra); font-weight: 300; font-size: 15pt; letter-spacing: .3em; color: var(--rosa); }
 .marca .kanji { font-family: var(--titulo); font-size: 14pt; letter-spacing: 0; }
-.lugar { font-family: var(--letra); font-size: 7pt; letter-spacing: .22em; text-transform: uppercase; color: var(--gris); margin-right: 26mm; }
+.lugar { font-family: var(--letra); font-size: 8pt; letter-spacing: .22em; text-transform: uppercase; color: var(--gris); margin-right: 26mm; }
 .cabeza { margin: 9mm 0 6mm; position: relative; }
-.cabeza .jp { display: block; font-family: var(--titulo); font-size: 11pt; letter-spacing: .3em; color: var(--rosa); margin-bottom: 1.5mm; min-height: 1em; }
-.cabeza h2 { font-family: var(--titulo); font-weight: 500; font-size: 27pt; margin: 0; color: var(--tinta); letter-spacing: .01em; }
-.cabeza .sub { margin: 2mm 0 0; font-family: var(--letra); font-size: 8.5pt; letter-spacing: .04em; color: var(--gris); }
+.cabeza .jp { display: block; font-family: var(--titulo); font-size: 12pt; letter-spacing: .3em; color: var(--rosa); margin-bottom: 1.5mm; min-height: 1em; }
+.cabeza h2 { font-family: var(--titulo); font-weight: 500; font-size: 30pt; margin: 0; color: var(--tinta); letter-spacing: .01em; }
+.cabeza .sub { margin: 2mm 0 0; font-family: var(--letra); font-size: 10.5pt; letter-spacing: .04em; color: var(--gris); }
 .cuerpo { flex: 1; position: relative; min-height: 0; overflow: hidden; }
 .cuerpo.cols2 { column-count: 2; column-gap: 9mm; column-rule: .5pt solid var(--linea); }
-.cuerpo section { break-inside: avoid-column; margin-bottom: 5mm; }
-.cuerpo section h3 { font-family: var(--letra); font-weight: 600; font-size: 8pt; letter-spacing: .26em; text-transform: uppercase; color: var(--rosa-oscuro); margin: 0 0 3mm; display: flex; align-items: center; gap: 3mm; }
+.cuerpo section { margin-bottom: 5mm; }
+.cuerpo section h3 { font-family: var(--letra); font-weight: 600; font-size: 10pt; letter-spacing: .26em; text-transform: uppercase; color: var(--rosa-oscuro); margin: 0 0 3.5mm; display: flex; align-items: center; gap: 3mm; }
 .cuerpo section h3::after { content: ''; flex: 1; height: .5pt; background: var(--linea); }
-.plato { margin-bottom: 3.6mm; break-inside: avoid; }
-.cols2 .plato { margin-bottom: 3mm; }
+.plato { margin-bottom: 4.5mm; break-inside: avoid; }
+.cols2 .plato { margin-bottom: 4mm; }
+.plato.con-foto { display: grid; grid-template-columns: 34mm 1fr; gap: 5mm; align-items: center; }
+.cols2 .plato.con-foto { grid-template-columns: 24mm 1fr; gap: 3.5mm; }
+.foto { display: block; width: 34mm; height: 34mm; object-fit: cover; border-radius: 3mm; border: .6pt solid var(--rosa-claro); box-shadow: 0 1mm 2.5mm rgba(68,48,58,.14); background: var(--rosa-palido); }
+.cols2 .foto { width: 24mm; height: 24mm; border-radius: 2.4mm; }
 .nombre { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1.6mm 2.2mm; }
-.nombre b { font-family: var(--titulo); font-weight: 700; font-size: 11.5pt; color: var(--tinta); }
-.cols2 .nombre b { font-size: 10.5pt; }
-.det { font-family: var(--letra); font-size: 7.5pt; letter-spacing: .06em; color: var(--gris); }
-.sig { display: inline-flex; align-items: center; gap: 1mm; font-family: var(--letra); font-size: 6.5pt; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--rosa); background: var(--rosa-palido); border: .5pt solid var(--rosa-claro); border-radius: 10pt; padding: .4mm 2mm .3mm 1.2mm; }
+.nombre b { font-family: var(--titulo); font-weight: 700; font-size: 14pt; color: var(--tinta); }
+.cols2 .nombre b { font-size: 12.5pt; }
+.det { font-family: var(--letra); font-size: 9pt; letter-spacing: .06em; color: var(--gris); }
+.sig { display: inline-flex; align-items: center; gap: 1mm; font-family: var(--letra); font-size: 7.5pt; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--rosa); background: var(--rosa-palido); border: .5pt solid var(--rosa-claro); border-radius: 10pt; padding: .4mm 2mm .3mm 1.2mm; }
 .sig svg { width: 3.4mm; height: 3.4mm; overflow: visible; }
-.plato p { margin: .8mm 0 0; font-family: var(--titulo); font-size: 9pt; line-height: 1.38; color: #5d4850; }
-.cols2 .plato p { font-size: 8.4pt; }
-.nota { font-family: var(--letra); font-size: 7.5pt; letter-spacing: .04em; color: var(--gris); font-style: italic; margin: 1mm 0 4mm; }
-.contenido footer { display: flex; justify-content: space-between; border-top: .6pt solid var(--linea); padding-top: 2.5mm; font-family: var(--letra); font-size: 7pt; letter-spacing: .24em; text-transform: uppercase; color: var(--gris); }
+.plato p { margin: 1mm 0 0; font-family: var(--titulo); font-size: 11pt; line-height: 1.4; color: #4f3b44; }
+.cols2 .plato p { font-size: 10pt; }
+.nota { font-family: var(--letra); font-size: 9pt; letter-spacing: .04em; color: var(--gris); font-style: italic; margin: 1mm 0 4mm; }
+.contenido footer { display: flex; justify-content: space-between; border-top: .6pt solid var(--linea); padding-top: 2.5mm; font-family: var(--letra); font-size: 8pt; letter-spacing: .24em; text-transform: uppercase; color: var(--gris); }
 
 [hidden] { display: none !important; }
 @media print {
@@ -157,8 +163,19 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
   // Estambres de la flor (se generan una vez).
   $('estambres').innerHTML = Array.from({ length: 10 }, (_, i) => '<g transform="rotate(' + i * 36 + ')"><line x1="0" y1="-4" x2="0" y2="-13" class="estambre"/><circle cy="-14" r="1.6" class="antera"/></g>').join('');
 
+  // Fotos de muestra (Unsplash, uso libre) hasta tener las del restaurante. Una foto propia o «Quitar foto» la sustituye.
+  const FOTOS_MUESTRA = {"Edamame": "photo-1557621956-ce58555aa0ce", "Sopa miso": "photo-1763470260582-894ae15f43bb", "Nasu no Miso Su": "photo-1706288586295-dadb4501b0ee", "Sunomono": "photo-1561466273-c13f88329aa0", "Escabeche japonés de boquerones": "photo-1560174122-cac0c0bdacc6", "Tres bocados HINOKI": "photo-1692740838550-fc67b4e78416", "Gyozas de pato": "photo-1738681336104-608b4e7dc3b0", "Pollo karaage": "photo-1700325341795-4793ac3ddb59", "Yakitori de pollo": "photo-1775379995350-43098b52d8ed", "Ebi Kushiyaki": "photo-1688084468401-4938b073aef2", "Tartar de salmón": "photo-1625944525533-473f1a3d54e7", "Tartar de atún": "photo-1722012988794-196d72bd12aa", "Usuzukuri de hamachi": "photo-1628280738974-24e582b9904a", "Tataki de bonito": "photo-1596189181426-7f63a1737f0d", "Sashimi moriawase": "photo-1743653258526-84f0245660c5", "Degustación de atún": "photo-1635452065566-9c89471bb86c", "Sashimi de salmón": "photo-1599084992304-0e2517910d3e", "Sashimi de hamachi": "photo-1730325559400-33573a1bca4c", "Sashimi de lubina": "photo-1563791743547-898d1485e3e5", "Saba | Caballa": "photo-1780817612617-cca92fc4b722", "Maguro | Atún": "photo-1790498486528-da1ff628e8f2", "Sake Koji | Salmón": "photo-1562158074-d49fbeffcc91", "Hamachi Yuzu": "photo-1642479513653-1b5a1664df8d", "Sake Aburi | Salmón": "photo-1710945301326-d60727e4833a", "Lubina | Jalapeño": "photo-1790643063016-f5c8365366e3", "Wagyu | Codorniz y trufa": "photo-1635451778386-e5778e66f61e", "California Kani": "photo-1648146298949-6b94f62164da", "Sake Hana": "photo-1635526910429-051cf1ed127e", "Akami Spicy": "photo-1580821082847-c53037ecfe0a", "Ebi Tempura Aburi": "photo-1774635812959-bd5cbaa9e496", "Pink Veggie": "photo-1730900737657-66c48d35ed3a", "Niji": "photo-1636425730652-ffdbada1ed4d", "Kaisen Lobster": "photo-1617196035154-1e7e6e28b0db", "Ebi Maguro": "photo-1653122024993-31e02aedb1ac", "Negitoro | Futomaki": "photo-1562158074-1602c2f19a08", "Hosomaki de salmón": "photo-1617196034738-26c5f7c977ce", "Hosomaki de atún": "photo-1555341748-a9d443dc3c14", "Hosomaki de aguacate": "photo-1709984110217-57d7d18e5299", "Hosomaki de queso y cebollino": "photo-1780291117619-c58ee7aa740e", "Spicy Tuna Temaki": "photo-1791386809517-60f40f5372dd", "Hamachi Yuzu Temaki": "photo-1710962169574-d1b52a2670e2", "Unagi Sansho Temaki": "photo-1791386809517-60f40f5372dd", "HINOKI 12": "photo-1617196034796-73dfa7b1fd56", "HINOKI 18": "photo-1611143669185-af224c5e3252", "HINOKI 22": "photo-1553621042-f6e147245754", "HINOKI Table Feast": "photo-1663334038419-71e6f82e333f", "Chirashi de salmón": "photo-1775889184907-36742cafb945", "Chirashi de atún": "photo-1678049379716-dcdf375eda2f", "Chirashi mixto": "photo-1565967531713-45739e0cad63", "Yakisoba de pollo y shiitake": "photo-1624904025321-24e2f17d06ce", "Udon de langostino": "photo-1558985212-324add95595a", "Wok de verduras": "photo-1564834724105-918b73d1b9e0", "Yakimeshi de pluma ibérica": "photo-1609570324378-ec0c4c9b6ba8", "Donburi de pollo teriyaki": "photo-1636401870585-a8852371e84a", "HINOKI Wagyu Yakiniku Don": "photo-1761064864527-d428a88cd4f5", "Cajita dulce HINOKI": "photo-1706350091276-ba994c35cd99", "Helado de té verde matcha": "photo-1534706936160-d5ee67737249", "Suflé de chocolate": "photo-1617305855058-336d24456869", "Cheesecake": "photo-1774988867972-98caecc776d8"};
+  const URL_MUESTRA = 'https://images.unsplash.com/';
+  const fotoMuestra = (nombre) => FOTOS_MUESTRA[nombre] ? URL_MUESTRA + FOTOS_MUESTRA[nombre] + '?w=480&h=480&fit=crop&q=75' : '';
+  const esMuestra = (foto) => typeof foto === 'string' && foto.startsWith(URL_MUESTRA);
+  function ponerMuestras(c) {
+    c.paginas.forEach((pg) => pg.secciones.forEach((s) => s.platos.forEach((p) => { if (p.foto === undefined && FOTOS_MUESTRA[p.nombre]) p.foto = fotoMuestra(p.nombre); })));
+    return c;
+  }
+  const hayMuestras = () => carta.paginas.some((pg) => pg.secciones.some((s) => s.platos.some((p) => esMuestra(p.foto))));
   let carta;
   try { carta = JSON.parse(localStorage.getItem(CLAVE)) || copiar(ORIGINAL); } catch (e) { carta = copiar(ORIGINAL); }
+  ponerMuestras(carta);
 
   let temporizador;
   function guardar() {
@@ -166,7 +183,7 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
     $('estado').textContent = 'Guardando…';
     temporizador = setTimeout(() => {
       try { localStorage.setItem(CLAVE, JSON.stringify(carta)); $('estado').textContent = 'Guardado'; }
-      catch (e) { $('estado').textContent = 'No se pudo guardar'; }
+      catch (e) { $('estado').textContent = 'No se pudo guardar: demasiadas fotos'; }
     }, 300);
   }
 
@@ -188,34 +205,72 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
       '<div class="sello"><div class="aro"></div><div class="kanji-grande">' + esc(r.kanji) + '</div><div class="nombre-grande">' + esc(r.nombre) + '</div><div class="lema">' + esc(r.lema) + '</div></div>' +
       '<div class="pie-portada"><span>Carta</span>' + (r.ciudad ? '<span class="punto">·</span><span>' + esc(r.ciudad) + '</span>' : '') + '</div></article>';
   }
-  function hoja(pg, i, total, r) {
-    const secciones = pg.secciones.map((s) => '<section><h3>' + esc(s.titulo) + '</h3>' + s.platos.map((p) =>
-      '<div class="plato"><div class="nombre"><b>' + esc(p.nombre) + '</b>' + (p.detalle ? '<span class="det">' + esc(p.detalle) + '</span>' : '') +
-      (p.signature ? '<span class="sig"><svg viewBox="-40 -40 80 80"><use href="#flor" x="-40" y="-40" width="80" height="80"/></svg>Signature</span>' : '') +
-      '</div>' + (p.descripcion ? '<p>' + esc(p.descripcion) + '</p>' : '') + '</div>').join('') + '</section>').join('');
-    return '<article class="pagina contenido"><svg class="deco" viewBox="0 0 210 297" preserveAspectRatio="none" aria-hidden="true">' + ramita(214, -6, 0.62, 18, true) + '</svg>' +
+  const platoHtml = (p) => '<div class="plato' + (p.foto ? ' con-foto' : '') + '">' + (p.foto ? '<img class="foto" src="' + esc(p.foto) + '" alt="">' : '') +
+    '<div><div class="nombre"><b>' + esc(p.nombre) + '</b>' + (p.detalle ? '<span class="det">' + esc(p.detalle) + '</span>' : '') +
+    (p.signature ? '<span class="sig"><svg viewBox="-40 -40 80 80"><use href="#flor" x="-40" y="-40" width="80" height="80"/></svg>Signature</span>' : '') +
+    '</div>' + (p.descripcion ? '<p>' + esc(p.descripcion) + '</p>' : '') + '</div></div>';
+  function hojaVacia(pg, r, sigue) {
+    const el = document.createElement('article');
+    el.className = 'pagina contenido';
+    el.innerHTML = '<svg class="deco" viewBox="0 0 210 297" preserveAspectRatio="none" aria-hidden="true">' + ramita(214, -6, 0.62, 18, true) + '</svg>' +
       '<header><div class="marca"><span class="kanji">' + esc(r.kanji) + '</span><span>' + esc(r.nombre) + '</span></div><div class="lugar">' + esc(r.lema) + (r.ciudad ? ' · ' + esc(r.ciudad) : '') + '</div></header>' +
-      '<div class="cabeza"><span class="jp">' + esc(pg.jp) + '</span><h2>' + esc(pg.titulo) + '</h2>' + (pg.sub ? '<p class="sub">' + esc(pg.sub) + '</p>' : '') + '</div>' +
-      '<div class="cuerpo cols' + (pg.cols === 2 ? 2 : 1) + '">' + secciones + '</div>' +
+      '<div class="cabeza"><span class="jp">' + esc(pg.jp) + '</span><h2>' + esc(pg.titulo) + '</h2>' + (sigue ? '<p class="sub">Continuación</p>' : pg.sub ? '<p class="sub">' + esc(pg.sub) + '</p>' : '') + '</div>' +
+      '<div class="cuerpo cols' + (pg.cols === 2 ? 2 : 1) + '"></div>' +
       (pg.nota ? '<p class="nota">' + esc(pg.nota) + '</p>' : '') +
-      '<footer><span>' + esc(r.nombre) + (r.ciudad ? ' · ' + esc(r.ciudad) : '') + '</span><span>' + (i + 1) + ' / ' + total + '</span></footer></article>';
+      '<footer><span>' + esc(r.nombre) + (r.ciudad ? ' · ' + esc(r.ciudad) : '') + '</span>' + (hayMuestras() ? '<span>Imágenes orientativas</span>' : '') + '<span class="num"></span></footer>';
+    $('hojas').appendChild(el);
+    return el.querySelector('.cuerpo');
+  }
+  const desborda = (c) => c.scrollHeight > c.clientHeight + 2 || c.scrollWidth > c.clientWidth + 2;
+  // Con letra grande y fotos una página de la carta puede no caber en una hoja: sigue en otra.
+  function hojasDePagina(pg, r) {
+    let cuerpo = hojaVacia(pg, r, false);
+    pg.secciones.forEach((s) => {
+      let sec = document.createElement('section');
+      sec.innerHTML = '<h3>' + esc(s.titulo) + '</h3>';
+      cuerpo.appendChild(sec);
+      s.platos.forEach((p) => {
+        sec.insertAdjacentHTML('beforeend', platoHtml(p));
+        if (!desborda(cuerpo)) return;
+        const ultimo = sec.lastElementChild;
+        const habiaPlatos = sec.querySelectorAll('.plato').length > 1;
+        if (!habiaPlatos && cuerpo.children.length === 1) return;
+        ultimo.remove();
+        if (!habiaPlatos) sec.remove();
+        cuerpo = hojaVacia(pg, r, true);
+        sec = document.createElement('section');
+        sec.innerHTML = '<h3>' + esc(s.titulo) + '</h3>';
+        cuerpo.appendChild(sec);
+        sec.appendChild(ultimo);
+      });
+    });
   }
   function pintarCarta() {
-    $('hojas').innerHTML = portada(carta.restaurante) + carta.paginas.map((pg, i) => hoja(pg, i, carta.paginas.length, carta.restaurante)).join('');
+    const oculta = $('vista').hidden;
+    $('vista').hidden = false;
+    $('hojas').innerHTML = portada(carta.restaurante);
+    carta.paginas.forEach((pg) => hojasDePagina(pg, carta.restaurante));
+    const nums = $('hojas').querySelectorAll('.contenido .num');
+    nums.forEach((n, i) => { n.textContent = (i + 1) + ' / ' + nums.length; });
+    $('vista').hidden = oculta;
     ajustarZoom();
+    return nums.length;
   }
   // En el móvil, la hoja A4 se encoge para caber en la pantalla.
   function ajustarZoom() {
     const ancho = 210 * 96 / 25.4;
     $('hojas').style.zoom = Math.min(1, (window.innerWidth - 24) / ancho);
   }
-  // Una sección que no cabe en su hoja se queda cortada: se avisa en el editor.
-  function paginasQueDesbordan() {
-    const fuera = [];
-    $('vista').hidden = false;
-    pintarCarta();
-    document.querySelectorAll('#hojas .contenido .cuerpo').forEach((c, i) => { if (c.scrollHeight > c.clientHeight + 2) fuera.push(i); });
-    return fuera;
+
+  // La foto se guarda dentro de la carta, pequeña: en la hoja mide 34 mm y así caben todas en el móvil.
+  const LADO_FOTO = 480;
+  async function fotoPequena(archivo) {
+    const img = await createImageBitmap(archivo);
+    const lado = Math.min(img.width, img.height);
+    const c = document.createElement('canvas');
+    c.width = c.height = Math.min(LADO_FOTO, lado);
+    c.getContext('2d').drawImage(img, (img.width - lado) / 2, (img.height - lado) / 2, lado, lado, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.78);
   }
 
   // ---------- Editor ----------
@@ -230,11 +285,10 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
   let abiertas = new Set([0]);
   function pintarEditor() {
     const r = carta.restaurante;
-    const fuera = paginasQueDesbordan();
-    $('vista').hidden = modo !== 'vista';
+    const hojas = pintarCarta();
     let h = '<div class="tarjeta"><h2>La carta</h2><p class="ayuda">Cambia lo que quieras: se guarda solo en este dispositivo. Toca «Ver carta» para verla como quedará y «Guardar PDF» para imprimirla o mandarla.</p>' +
       '<div class="campos">' + campo('Nombre', 'restaurante.nombre', r.nombre) + campo('Kanji', 'restaurante.kanji', r.kanji) + campo('Lema', 'restaurante.lema', r.lema) + campo('Ciudad', 'restaurante.ciudad', r.ciudad) + '</div></div>';
-    if (fuera.length) h += '<div class="aviso-desborde">⚠️ ' + fuera.map((i) => '«' + esc(carta.paginas[i].titulo) + '»').join(', ') + (fuera.length === 1 ? ' no cabe' : ' no caben') + ' en su hoja. Quita algún plato, acorta textos, pásala a 2 columnas o mueve una sección a otra página.</div>';
+    h = h.replace('</p><div class="campos">', ' La carta ocupa ' + (hojas + 1) + ' hojas con la portada: si una página no cabe, sigue sola en la siguiente.</p><div class="campos">');
     carta.paginas.forEach((pg, i) => {
       const n = pg.secciones.reduce((t, s) => t + s.platos.length, 0);
       h += '<details class="pagina-ed" data-i="' + i + '"' + (abiertas.has(i) ? ' open' : '') + '><summary><span class="jp">' + esc(pg.jp) + '</span>' + esc(pg.titulo || 'Página sin título') + '<span class="cuenta">' + n + (n === 1 ? ' plato' : ' platos') + '</span></summary><div class="cuerpo-ed">' +
@@ -247,6 +301,9 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
           const base = 'paginas.' + i + '.secciones.' + j + '.platos.' + k;
           h += '<div class="plato-ed"><div class="fila">' + campo('Plato', base + '.nombre', p.nombre) + campo('Detalle', base + '.detalle', p.detalle) + '</div>' +
             campo('Descripción', base + '.descripcion', p.descripcion, 'area') +
+            '<div class="foto-ed">' + (p.foto ? '<img src="' + esc(p.foto) + '" alt="Foto de ' + esc(p.nombre) + '">' : '<span class="sin" aria-hidden="true">📷</span>') +
+            '<button type="button" class="btn claro" data-accion="foto" data-ruta="' + i + '.' + j + '.' + k + '">' + (esMuestra(p.foto) ? 'Poner la foto real' : p.foto ? 'Cambiar foto' : 'Poner foto del plato') + '</button>' +
+            (p.foto ? '<button type="button" class="btn texto" data-accion="quitarFoto" data-ruta="' + i + '.' + j + '.' + k + '">Quitar foto</button>' : '') + '</div>' +
             mover('plato', i + '.' + j + '.' + k, '<label class="sig-ed"><input type="checkbox" data-ruta="' + base + '.signature"' + (p.signature ? ' checked' : '') + '> Signature</label>') + '</div>';
         });
         h += '<div class="anadir"><button type="button" class="btn claro" data-accion="nuevoPlato" data-ruta="' + i + '.' + j + '">+ Plato</button></div></div>';
@@ -304,6 +361,19 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
         if (k + d < 0 || k + d >= arr.length) return;
         [arr[k], arr[k + d]] = [arr[k + d], arr[k]];
       }
+    } else if (a === 'foto') {
+      const [arr, k] = lista('plato', ruta);
+      const entrada = document.createElement('input');
+      entrada.type = 'file'; entrada.accept = 'image/*';
+      entrada.onchange = async () => {
+        try { arr[k].foto = await fotoPequena(entrada.files[0]); guardar(); pintarEditor(); }
+        catch (err) { alert('No se pudo usar esa foto.'); }
+      };
+      entrada.click();
+      return;
+    } else if (a === 'quitarFoto') {
+      const [arr, k] = lista('plato', ruta);
+      arr[k].foto = '';
     } else if (a === 'nuevoPlato') {
       const [i, j] = ruta.split('.').map(Number);
       carta.paginas[i].secciones[j].platos.push({ nombre: 'Plato nuevo', detalle: '', signature: false, descripcion: '' });
@@ -328,14 +398,14 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
           const c = JSON.parse(await entrada.files[0].text());
           if (!c || !c.restaurante || !Array.isArray(c.paginas)) throw new Error();
           if (!confirm('¿Cambiar la carta actual por la de la copia?')) return;
-          carta = c; guardar(); pintarEditor();
+          carta = ponerMuestras(c); guardar(); pintarEditor();
         } catch (err) { alert('Ese archivo no es una copia de la carta.'); }
       };
       entrada.click();
       return;
     } else if (a === 'original') {
       if (!confirm('¿Volver a la carta original? Se pierden los cambios que no estén en una copia.')) return;
-      carta = copiar(ORIGINAL);
+      carta = ponerMuestras(copiar(ORIGINAL));
     }
     guardar();
     pintarEditor();
@@ -361,7 +431,9 @@ details.pagina-ed[open] > summary::before { transform: rotate(90deg); }
     const volver = () => { document.title = anterior; $('vista').hidden = modo !== 'vista'; };
     $('vista').hidden = false;
     window.addEventListener('afterprint', volver, { once: true });
-    setTimeout(() => window.print(), 50);
+    // Las fotos de muestra llegan por internet: se espera a que estén antes de imprimir.
+    const fotos = [...document.querySelectorAll('#hojas img')].map((im) => im.complete ? null : new Promise((ok) => { im.onload = im.onerror = ok; })).filter(Boolean);
+    Promise.race([Promise.all(fotos), new Promise((ok) => setTimeout(ok, 15000))]).then(() => setTimeout(() => window.print(), 50));
   });
   window.addEventListener('resize', ajustarZoom);
 
